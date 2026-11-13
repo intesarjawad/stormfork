@@ -1,0 +1,9 @@
+id: hindcast_melissa_2025
+title: Hurricane Melissa hindcast from three initial times
+kind: hindcast
+storm: 2025294N14290
+init: [2025-10-22T12:00Z, 2025-10-24T12:00Z, 2025-10-26T12:00Z]
+source: era5
+seeds: {baseline: 0, control: 1000}
+limits:
+  - "Initial conditions are reconstructed from ERA5 reanalysis, not the analysis available at the time, so a hindcast shows what the model does from a reconstructed state and is not the forecast it would have issued then."

@@ -1,0 +1,8 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.17.3
+    hooks: [{ id: ruff-check, args: [--fix] }, { id: ruff-format }]
+  - repo: local
+    hooks:
+      - { id: pyright, name: pyright, entry: uv run pyright, language: system, types: [python], pass_filenames: false }
+      - { id: site-lint, name: site lint and typecheck, entry: bash -c "cd site && pnpm lint && pnpm typecheck", language: system, files: ^site/, pass_filenames: false }

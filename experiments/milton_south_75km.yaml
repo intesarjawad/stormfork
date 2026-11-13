@@ -1,0 +1,17 @@
+id: milton_south_75km
+title: Hurricane Milton, starting position moved 75 km south
+kind: fork
+storm: 2024279N21265
+init: 2024-10-07T00:00Z
+source: hres_sample
+edit:
+  type: relocate
+  params:
+    east_km: 0
+    north_km: -75
+taper:
+  centre: [22.5, -93.4]
+  radius_km: 400.0
+seeds: {baseline: 0, control: 1000}
+limits:
+  - "The shift is a constant angular offset at the taper centre with no area rescaling, and the adjustment ratio flags excess change without being a calibrated balance test."

@@ -1,0 +1,68 @@
+name: pages
+on:
+  workflow_call:
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with: { version: '0.13.7' }
+      - run: uv sync --frozen --no-group model
+      - name: Fetch verified published atlases
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ ! -s site/atlases.lock.json ]; then
+            echo '::error::Missing atlas release lock: publish the atlas archive and commit site/atlases.lock.json before deploying.' >&2
+            exit 1
+          fi
+          uv run --no-group model python - <<'PY'
+          from pathlib import Path
+          from stormfork.cli_remote import Lock
+          lock = Lock.model_validate_json(Path('site/atlases.lock.json').read_bytes())
+          required = {'sandy_east_300km', lock.hero.id}
+          missing = required - lock.experiments.keys()
+          if missing:
+              raise SystemExit(f'Atlas release lock omits required home experiments: {sorted(missing)}')
+          PY
+          uv run --no-group model python scripts/fetch_atlases.py
+      - uses: pnpm/action-setup@v6
+        with: { version: '12' }
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: pnpm
+          cache-dependency-path: site/pnpm-lock.yaml
+      - name: Fetch the published scores
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p site/public/scores
+          if git ls-remote --exit-code --heads origin data >/dev/null; then
+            git fetch --no-tags origin data
+            if git cat-file -e FETCH_HEAD:scores/scores.json 2>/dev/null; then
+              git show FETCH_HEAD:scores/scores.json > site/public/scores/scores.json
+            fi
+          fi
+      - run: cd site && pnpm install --frozen-lockfile --ignore-scripts
+      - run: cd site && pnpm run build
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
+        with: { path: site/dist }
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5

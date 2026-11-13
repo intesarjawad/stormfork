@@ -1,0 +1,165 @@
+name: WN2 collector
+on:
+  schedule:
+    - cron: '30 6 * * *'
+    - cron: '30 18 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: wn2-collector
+  cancel-in-progress: false
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with: { version: '0.13.7' }
+      - run: uv sync --frozen --no-group model
+      - run: uv run --no-group model stormfork scores collect --output "$RUNNER_TEMP/collected"
+      - name: Restore archived backfill chunks
+        if: github.event.schedule == '30 6 * * *' || github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/backfill"
+          data_ref=$(git ls-remote --heads origin data)
+          if [ -n "$data_ref" ]; then
+            git fetch --no-tags origin data
+            for directory in previous_runs observations; do
+              if git cat-file -e "FETCH_HEAD:$directory" 2>/dev/null; then
+                git archive FETCH_HEAD "$directory" | tar -x -C "$RUNNER_TEMP/backfill"
+              fi
+            done
+          fi
+      - name: Backfill the Previous Runs archive
+        if: github.event.schedule == '30 6 * * *' || github.event_name == 'workflow_dispatch'
+        run: >-
+          uv run --no-group model stormfork scores backfill
+          --since 2024-01-01 --output "$RUNNER_TEMP/backfill"
+      - name: Store complete run on the data branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git ls-remote --exit-code --heads origin data >/dev/null; then
+            git fetch --no-tags origin data
+            git switch --detach FETCH_HEAD
+          else
+            git switch --orphan data
+          fi
+          mkdir -p wn2 previous_runs observations
+          cp "$RUNNER_TEMP"/collected/wn2/*.parquet wn2/
+          if [ -d "$RUNNER_TEMP/backfill" ]; then
+            cp -R "$RUNNER_TEMP"/backfill/. .
+          fi
+          git add wn2 previous_runs observations
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'data: collect complete WN2 run and archive chunk'
+          git push origin HEAD:refs/heads/data
+  score:
+    needs: collect
+    if: always() && !cancelled() && (github.event.schedule == '30 6 * * *' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      actions: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    outputs:
+      atlas_locked: ${{ steps.atlas.outputs.locked }}
+    steps:
+      - uses: actions/checkout@v7
+      - id: atlas
+        run: echo "locked=$([ -s site/atlases.lock.json ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with: { version: '0.13.7' }
+      - run: uv sync --frozen --no-group model
+      - name: Fetch yesterday's observations and IFS forecasts
+        id: score_inputs
+        continue-on-error: true
+        run: uv run --no-group model stormfork scores fetch --output "$RUNNER_TEMP/score-inputs"
+      - name: Probe WN2 Previous Runs availability
+        id: wn2_probe
+        continue-on-error: true
+        if: github.event.schedule == '30 6 * * *' || github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "$(date -u +%u)" != "1" ]; then
+            exit 0
+          fi
+          echo "available=$(uv run --no-group model stormfork scores probe)" >> "$GITHUB_OUTPUT"
+      - name: Check out the data branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git ls-remote --exit-code --heads origin data >/dev/null; then
+            git fetch --no-tags origin data
+            git worktree add "$RUNNER_TEMP/data" FETCH_HEAD
+          else
+            git worktree add --detach "$RUNNER_TEMP/data"
+            git -C "$RUNNER_TEMP/data" switch --orphan data
+          fi
+      - name: Rebuild scores.json
+        shell: bash
+        run: |
+          set -euo pipefail
+          inputs="$RUNNER_TEMP/score-inputs"
+          if [ "${{ steps.score_inputs.outcome }}" != "success" ]; then
+            inputs="$RUNNER_TEMP/data/score-inputs"
+            if [ ! -f "$inputs/observations.csv" ] || [ ! -f "$inputs/ifs.csv" ] || [ ! -f "$inputs/scoring-day.txt" ]; then
+              echo "No complete stored score inputs; rerun stormfork scores fetch." >&2
+              exit 1
+            fi
+            echo "::warning::Fresh input fetch failed. Using stored score inputs; source dates remain unchanged."
+          fi
+          extra=(--scoring-day "$(cat "$inputs/scoring-day.txt")")
+          if [ -n "${{ steps.wn2_probe.outputs.available }}" ]; then
+            extra+=(--wn2-previous-runs-available "${{ steps.wn2_probe.outputs.available }}")
+          fi
+          uv run --no-group model stormfork scores build \
+            --wn2 "$RUNNER_TEMP/data/wn2" \
+            --observations "$inputs/observations.csv" \
+            --ifs "$inputs/ifs.csv" \
+            --output "$RUNNER_TEMP/scores.json" \
+            "${extra[@]}"
+      - name: Commit scores.json to the data branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/data/scores"
+          if [ "${{ steps.score_inputs.outcome }}" = "success" ]; then
+            mkdir -p "$RUNNER_TEMP/data/score-inputs"
+            cp "$RUNNER_TEMP/score-inputs/observations.csv" "$RUNNER_TEMP/score-inputs/ifs.csv" "$RUNNER_TEMP/score-inputs/scoring-day.txt" "$RUNNER_TEMP/data/score-inputs/"
+            git -C "$RUNNER_TEMP/data" add score-inputs
+          fi
+          cp "$RUNNER_TEMP/scores.json" "$RUNNER_TEMP/data/scores/scores.json"
+          git -C "$RUNNER_TEMP/data" add scores/scores.json
+          if git -C "$RUNNER_TEMP/data" diff --cached --quiet; then
+            exit 0
+          fi
+          git -C "$RUNNER_TEMP/data" config user.name 'github-actions[bot]'
+          git -C "$RUNNER_TEMP/data" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C "$RUNNER_TEMP/data" commit -m 'data: rebuild the scoreboard'
+          git -C "$RUNNER_TEMP/data" push origin HEAD:refs/heads/data
+      - name: Report data faults
+        run: uv run --no-group model python scripts/report_data_faults.py "$RUNNER_TEMP/scores.json"
+      - name: Keep the schedule enabled
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/scoreboard.yml/enable"
+  deploy:
+    needs: score
+    # The site needs a published atlas. Until one is locked the collector only stores data.
+    if: >-
+      always() && !cancelled() && needs.score.result == 'success'
+      && needs.score.outputs.atlas_locked == 'true'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/pages.yml

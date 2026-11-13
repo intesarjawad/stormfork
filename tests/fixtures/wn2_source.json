@@ -1,0 +1,5 @@
+{
+  "url": "https://ensemble-api.open-meteo.com/v1/ensemble?latitude=25.7907&longitude=-80.3164&hourly=temperature_2m%2Cpressure_msl%2Cwind_speed_10m&models=google_weathernext2_ensemble&wind_speed_unit=ms&temperature_unit=celsius&timezone=GMT&start_hour=2026-11-05T00%3A00&end_hour=2026-11-12T00%3A00",
+  "metadata_url": "https://ensemble-api.open-meteo.com/data/google_weathernext2_ensemble/static/meta.json",
+  "recorded_at": "2026-11-05T14:00:56.735881+00:00"
+}

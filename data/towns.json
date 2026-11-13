@@ -1,0 +1,146 @@
+[
+  {
+    "icao": "KEYW",
+    "name": "Key West",
+    "lat": 24.5561,
+    "lon": -81.7596
+  },
+  {
+    "icao": "KMIA",
+    "name": "MIAMI INTL AIRPORT",
+    "lat": 25.788,
+    "lon": -80.3169
+  },
+  {
+    "icao": "KRSW",
+    "name": "FT MYERS/SW FLORIDA",
+    "lat": 26.5381,
+    "lon": -81.7567
+  },
+  {
+    "icao": "KTPA",
+    "name": "TAMPA INTL AIRPORT",
+    "lat": 27.9619,
+    "lon": -82.5403
+  },
+  {
+    "icao": "KTLH",
+    "name": "TALLAHASSEE RGNL",
+    "lat": 30.3935,
+    "lon": -84.3514
+  },
+  {
+    "icao": "KPNS",
+    "name": "PENSACOLA REGIONAL",
+    "lat": 30.4781,
+    "lon": -87.1869
+  },
+  {
+    "icao": "KMOB",
+    "name": "MOBILE/BATES FIELD",
+    "lat": 30.6883,
+    "lon": -88.2456
+  },
+  {
+    "icao": "KGPT",
+    "name": "GULFPORT-BILOXI",
+    "lat": 30.4073,
+    "lon": -89.0701
+  },
+  {
+    "icao": "KMSY",
+    "name": "New Orleans - Louis Armstrong",
+    "lat": 29.9933,
+    "lon": -90.2511
+  },
+  {
+    "icao": "KLCH",
+    "name": "Lake Charles",
+    "lat": 30.1255,
+    "lon": -93.2277
+  },
+  {
+    "icao": "KGLS",
+    "name": "GALVESTON/SCHOLES",
+    "lat": 29.2653,
+    "lon": -94.8604
+  },
+  {
+    "icao": "KHOU",
+    "name": "HOUSTON/WILL HOBBY",
+    "lat": 29.6375,
+    "lon": -95.2824
+  },
+  {
+    "icao": "KCRP",
+    "name": "CORPUS CHRISTI INTL",
+    "lat": 27.7731,
+    "lon": -97.5128
+  },
+  {
+    "icao": "KBRO",
+    "name": "BROWNSVILLE INTL",
+    "lat": 25.9146,
+    "lon": -97.4231
+  },
+  {
+    "icao": "KJAX",
+    "name": "Jacksonville Intl",
+    "lat": 30.4941,
+    "lon": -81.6879
+  },
+  {
+    "icao": "KSAV",
+    "name": "Savannah - Hilton Head",
+    "lat": 32.1314,
+    "lon": -81.2023
+  },
+  {
+    "icao": "KCHS",
+    "name": "Charleston",
+    "lat": 32.8986,
+    "lon": -80.0405
+  },
+  {
+    "icao": "KILM",
+    "name": "Wilmington Intl",
+    "lat": 34.27,
+    "lon": -77.9
+  },
+  {
+    "icao": "KHSE",
+    "name": "HATTERAS_(ASOS)",
+    "lat": 35.2322,
+    "lon": -75.6225
+  },
+  {
+    "icao": "KORF",
+    "name": "NORFOLK INTL ARPT",
+    "lat": 36.9033,
+    "lon": -76.1922
+  },
+  {
+    "icao": "KACY",
+    "name": "ATLANTIC CITY INTL",
+    "lat": 39.4576,
+    "lon": -74.5772
+  },
+  {
+    "icao": "KJFK",
+    "name": "NEW YORK/JF KENNEDY",
+    "lat": 40.6386,
+    "lon": -73.7622
+  },
+  {
+    "icao": "KBOS",
+    "name": "BOSTON/LOGAN INTL",
+    "lat": 42.3606,
+    "lon": -71.0097
+  },
+  {
+    "icao": "TJSJ",
+    "name": "San Juan",
+    "lat": 18.4325,
+    "lon": -66.0108
+  }
+]

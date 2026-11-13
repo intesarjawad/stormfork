@@ -1,0 +1,91 @@
+@font-face {
+  font-family: "IM Fell English";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/im-fell-english-latin-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "IM Fell English";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/im-fell-english-latin-italic.woff2") format("woff2");
+}
+
+/* IM Fell's figures are old-style, and its zero reads as a letter o; prose borrows the
+   lining figures of EB Garamond, the nearest free face of the same lineage. */
+@font-face {
+  font-family: "Fell Figures";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/eb-garamond-figures-normal.woff2") format("woff2");
+  unicode-range: U+0030-0039;
+}
+
+@font-face {
+  font-family: "Fell Figures";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/eb-garamond-figures-italic.woff2") format("woff2");
+  unicode-range: U+0030-0039;
+}
+
+@font-face {
+  font-family: "Departure Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("./fonts/departure-mono.woff2") format("woff2");
+}
+
+:root {
+  color-scheme: dark;
+
+  /* Two inks and nothing else: every grey on the site is a dither or a dotted rule. */
+  --ground: #1d2290;
+  --ink: #ece6d6;
+  --sea: var(--ground);
+  --land: var(--ground);
+  --coast: var(--ink);
+  --chart-grid: var(--ink);
+  --ink-2: var(--ink);
+  --line: var(--ink);
+  --line-strong: var(--ink);
+  --panel: var(--ground);
+  --baseline: var(--ink);
+  --fork: var(--ink);
+  --control: var(--ink);
+  --fork-ink: var(--ink);
+
+  --display: "Fell Figures", "IM Fell English", Georgia, serif;
+  --text: "Fell Figures", "IM Fell English", Georgia, serif;
+  --mono: "Departure Mono", ui-monospace, monospace;
+
+  /* One ratio (1.25) for type and a 4 px grid for space. */
+  --t-12: 0.75rem;
+  --t-14: 0.875rem;
+  --t-16: 1rem;
+  --t-20: 1.25rem;
+  --t-25: 1.5625rem;
+  --t-31: 1.953rem;
+  --t-39: 2.441rem;
+  --t-49: 3.052rem;
+  --t-61: 3.815rem;
+  --t-76: 4.768rem;
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-6: 1.5rem;
+  --s-8: 2rem;
+  --s-12: 3rem;
+  --s-16: 4rem;
+  --s-24: 6rem;
+
+  --bar: 4rem;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}

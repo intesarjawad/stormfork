@@ -1,0 +1,7 @@
+cff-version: 1.2.0
+message: Cite the revision used and acknowledge upstream data and model sources in LICENSES.md.
+title: Stormfork
+type: software
+authors:
+  - name: stormfork contributors
+license: MIT

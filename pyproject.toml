@@ -1,0 +1,68 @@
+[build-system]
+requires = ["uv_build==0.13.7"]
+build-backend = "uv_build"
+
+[project]
+name = "stormfork"
+version = "0.0.0"
+description = "Move a hurricane in a weather model. See where it goes."
+requires-python = ">=3.12,<3.13"
+license = "MIT"
+readme = "README.md"
+dependencies = [
+  "xarray==2026.2.0", "zarr==3.4.2", "gcsfs==2026.10.1", "numpy==2.5.4",
+  "scipy==1.18.1", "pandas==2.3.3", "cfgrib==0.9.15.1", "eccodes==2.50.0",
+  "pyarrow==26.0.1", "pydantic==2.14.3", "pillow==13.0.0", "pyyaml==6.0.3",
+  "matplotlib==3.11.2", "h5py==3.16.0",
+]
+
+[project.scripts]
+stormfork = "stormfork.cli:main"
+
+[dependency-groups]
+dev = ["ruff==0.17.4", "pyright==1.1.414", "pytest==9.2.0", "hypothesis==6.170.15", "pre-commit==4.7.0",
+       "cffconvert==2.0.0", "scipy-stubs==1.18.1.1", "pandas-stubs==2.3.3.260113", "types-PyYAML==6.0.12.20261103",
+       "cmocean==4.0.3", "colorspacious==1.1.2", "nbformat==5.11.1"]
+model = ["weathernext @ git+https://github.com/google-deepmind/weathernext.git@v0.3.0", "jax==0.12.0.1"]
+
+[tool.uv]
+default-groups = ["dev", "model"]
+override-dependencies = ["colabtools; sys_platform == 'never'"]
+
+[tool.uv.build-backend]
+module-root = ""
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["typings"]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+  "CPY001",
+  "COM812", "ISC001",
+  "D100", "D104", "D105", "D107",
+  "D203", "D213",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "PLR2004", "D", "ANN201"]
+"scripts/**" = ["T201", "INP001"]
+"envs/**" = ["INP001"]
+"notebooks/**" = ["T201", "E501"]
+"stormfork/cli.py" = ["T201"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.pyright]
+include = ["stormfork", "tests", "scripts"]
+typeCheckingMode = "strict"
+pythonVersion = "3.12"
+stubPath = "typings"
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-markers --strict-config"
+markers = ["network: needs internet or cloud buckets; excluded in CI"]
+xfail_strict = true

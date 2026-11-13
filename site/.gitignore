@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.vite/
+playwright-report/
+test-results/
+# Published experiments are fetched from their release (scripts/fetch_atlases.py); only the fixture is committed.
+public/experiments/*
+!public/experiments/demo-fixture/

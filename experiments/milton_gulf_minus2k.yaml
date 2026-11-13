@@ -1,0 +1,15 @@
+id: milton_gulf_minus2k
+title: Hurricane Milton, Gulf of Mexico sea surface cooled by 2 K at its peak
+kind: fork
+storm: 2024279N21265
+init: 2024-10-07T00:00Z
+source: hres_sample
+edit:
+  type: sst_anomaly
+  params:
+    centre: [25.5, -86.0]
+    sigma_km: 400
+    delta_k: -2
+seeds: {baseline: 0, control: 1000}
+limits:
+  - "The SST change does not rebalance geopotential or other coupled fields, so the first model step adjusts them."

@@ -1,0 +1,5 @@
+{
+  "url": "https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py?station=KMIA&data=tmpf&data=mslp&data=sknt&year1=2026&month1=11&day1=2&year2=2026&month2=11&day2=7&tz=UTC&format=onlycomma&latlon=no&missing=M&trace=T&direct=no&report_type=3",
+  "station": "KMIA",
+  "recorded_at": "2026-11-07T09:55:00+00:00"
+}

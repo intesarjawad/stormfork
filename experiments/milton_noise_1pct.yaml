@@ -1,0 +1,14 @@
+id: milton_noise_1pct
+title: Hurricane Milton, noise at 1 percent of the spatial standard deviation
+kind: fork
+storm: 2024279N21265
+init: 2024-10-07T00:00Z
+source: hres_sample
+edit:
+  type: noise
+  params:
+    amplitude: 0.01
+    seed: 0
+seeds: {baseline: 0, control: 1000}
+limits:
+  - "The noise does not rebalance geopotential or other coupled fields, and its amplitude is a fraction of each slice's spatial standard deviation, not an observational uncertainty estimate."

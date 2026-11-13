@@ -1,0 +1,3 @@
+# Patched releases that the lint toolchain's own ranges do not reach yet. Drop an entry once its parent allows it.
+overrides:
+  minimatch: ^11.0.1

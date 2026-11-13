@@ -1,0 +1,29 @@
+{
+  "source_url": "https://www.ncei.noaa.gov/data/international-best-track-archive-for-climate-stewardship-ibtracs/v04r01/access/csv/ibtracs.NA.list.v04r01.csv",
+  "version": "v04r01",
+  "retrieved": "2026-11-07",
+  "source_sha256": "666681be5b12caf5bad7a511bae5f6e5fa8b03789f7f6dd00ee2f0aaa41c2c97",
+  "fixture_sha256": "032f16dde4af3075de8ac57412d4ff8fe8fd5e02073857c9eff80f18f2b1a422",
+  "selection": {
+    "landfall_sids": [
+      "2024268N17278",
+      "2024279N21265",
+      "2025294N14290"
+    ],
+    "taper_rows": [
+      {
+        "SID": "2012296N14283",
+        "ISO_TIME": "2012-10-26 00:00:00"
+      },
+      {
+        "SID": "2005236N23285",
+        "ISO_TIME": "2005-08-27 00:00:00"
+      },
+      {
+        "SID": "2024279N21265",
+        "ISO_TIME": "2024-10-07 00:00:00"
+      }
+    ]
+  },
+  "column_documentation": "https://www.ncei.noaa.gov/sites/default/files/2025-09/IBTrACS_v04r01_column_documentation.pdf"
+}

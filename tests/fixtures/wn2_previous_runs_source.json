@@ -1,0 +1,6 @@
+{
+  "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=25.788&longitude=-80.3169&models=google_weathernext2_ensemble&hourly=temperature_2m_previous_day1&wind_speed_unit=ms&temperature_unit=celsius&timezone=GMT&start_date=2026-10-31&end_date=2026-11-07",
+  "station": "KMIA",
+  "recorded_at": "2026-11-07T09:55:00+00:00",
+  "note": "The archive returns only nulls, which is what the weekly availability probe reports."
+}

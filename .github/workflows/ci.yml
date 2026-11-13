@@ -1,0 +1,43 @@
+name: ci
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with: { version: '0.13.7' }
+      - run: uv sync --frozen
+      - run: make check
+      - run: uv run python scripts/verify_manifest.py
+      - run: uv run python scripts/recipes_schema.py --check docs/recipes.md
+      - run: uv run python scripts/verify_citations.py
+      - name: Hold added reproductions to the pull request author
+        if: github.event_name == 'pull_request'
+        env:
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          git fetch --no-tags --depth=1 origin "$BASE_REF"
+          uv run python scripts/verify_manifest.py --pr-author "$PR_AUTHOR" --base "origin/$BASE_REF"
+  site:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with: { version: '12.16.1' }
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: pnpm
+          cache-dependency-path: site/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+        working-directory: site
+      - run: pnpm run check
+        working-directory: site
+      - run: pnpm run build
+        working-directory: site
+      - run: pnpm run test:visual
+        working-directory: site

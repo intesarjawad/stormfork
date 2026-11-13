@@ -1,0 +1,54 @@
+[
+  {
+    "url": "https://mesonet.agron.iastate.edu/geojson/network/FL_ASOS.geojson",
+    "recorded_at": "2026-11-05T13:58:04.477699+00:00"
+  },
+  {
+    "url": "https://mesonet.agron.iastate.edu/geojson/network/AL_ASOS.geojson",
+    "recorded_at": "2026-11-05T13:58:04.911528+00:00"
+  },
+  {
+    "url": "https://mesonet.agron.iastate.edu/geojson/network/MS_ASOS.geojson",
+    "recorded_at": "2026-11-05T13:58:05.333801+00:00"
+  },
+  {
+    "url": "https://mesonet.agron.iastate.edu/geojson/network/LA_ASOS.geojson",
+    "recorded_at": "2026-11-05T13:58:05.800030+00:00"
+  },
+  {
+    "url": "https://mesonet.agron.iastate.edu/geojson/network/TX_ASOS.geojson",
+    "recorded_at": "2026-11-05T13:58:06.304316+00:00"
+  },
+  {
+    "url": "https://mesonet.agron.iastate.edu/geojson/network/GA_ASOS.geojson",
+    "recorded_at": "2026-11-05T13:58:06.764422+00:00"
+  },
+  {
+    "url": "https://mesonet.agron.iastate.edu/geojson/network/SC_ASOS.geojson",
+    "recorded_at": "2026-11-05T13:58:07.276652+00:00"
+  },
+  {
+    "url": "https://mesonet.agron.iastate.edu/geojson/network/NC_ASOS.geojson",
+    "recorded_at": "2026-11-05T13:58:07.677550+00:00"
+  },
+  {
+    "url": "https://mesonet.agron.iastate.edu/geojson/network/VA_ASOS.geojson",
+    "recorded_at": "2026-11-05T13:58:08.117758+00:00"
+  },
+  {
+    "url": "https://mesonet.agron.iastate.edu/geojson/network/NJ_ASOS.geojson",
+    "recorded_at": "2026-11-05T13:58:08.491759+00:00"
+  },
+  {
+    "url": "https://mesonet.agron.iastate.edu/geojson/network/NY_ASOS.geojson",
+    "recorded_at": "2026-11-05T13:58:08.939056+00:00"
+  },
+  {
+    "url": "https://mesonet.agron.iastate.edu/geojson/network/MA_ASOS.geojson",
+    "recorded_at": "2026-11-05T13:58:09.291116+00:00"
+  },
+  {
+    "url": "https://mesonet.agron.iastate.edu/geojson/network/PR_ASOS.geojson",
+    "recorded_at": "2026-11-05T13:58:09.674037+00:00"
+  }
+]

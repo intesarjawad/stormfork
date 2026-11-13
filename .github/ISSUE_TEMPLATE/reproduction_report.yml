@@ -1,0 +1,26 @@
+name: Reproduction report
+description: Report that you reran a published experiment.
+title: "Reproduction: <experiment id>"
+body:
+  - type: input
+    id: experiment
+    attributes:
+      label: Experiment id
+      description: The id from stormfork scenarios list, such as milton_noise_1pct.
+    validations: { required: true }
+  - type: textarea
+    id: entry
+    attributes:
+      label: Entry
+      description: >-
+        The JSON line printed by stormfork verify <id> --reproduction <run-dir> --by <your-login>.
+        Append it to site/public/experiments/<id>/reproductions.json in a pull request;
+        the by field must be the pull request author.
+      render: json
+    validations: { required: true }
+  - type: textarea
+    id: environment
+    attributes:
+      label: Runtime
+      description: Hardware, operating system and anything unusual about the run.
+    validations: { required: true }

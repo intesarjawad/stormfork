@@ -1,0 +1,70 @@
+name: publish-experiment
+on:
+  workflow_dispatch:
+    inputs:
+      experiment_id:
+        description: Experiment id, as in its merged manifest
+        required: true
+      hf_revision:
+        description: Hugging Face pull request revision, such as refs/pr/3
+        required: true
+concurrency: publish-experiment
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: hf-publish
+    env:
+      EXPERIMENT_ID: ${{ inputs.experiment_id }}
+      HF_REVISION: ${{ inputs.hf_revision }}
+      HF_DATASET: ${{ vars.HF_DATASET }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Check the inputs
+        run: |
+          [[ "$EXPERIMENT_ID" =~ ^[a-z0-9][a-z0-9_-]*$ ]]
+          [[ "$HF_REVISION" =~ ^refs/pr/[0-9]+$ ]]
+          [[ -n "$HF_DATASET" ]]
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with: { version: '0.13.7' }
+      - run: uv sync --frozen
+      - name: Download the pull request revision
+        run: |
+          uvx --from huggingface_hub hf download "$HF_DATASET" "$EXPERIMENT_ID.zip" \
+            --repo-type dataset --revision "$HF_REVISION" --local-dir "$RUNNER_TEMP/download"
+      - name: Unpack and check against the merged manifest and ledger
+        run: |
+          uv run python scripts/publish_experiment.py check "$EXPERIMENT_ID" \
+            "$RUNNER_TEMP/download/$EXPERIMENT_ID.zip" --workdir "$RUNNER_TEMP/unpacked"
+      - name: Merge the Hugging Face pull request
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          uvx --from huggingface_hub python -c '
+          import os
+          from huggingface_hub import HfApi
+          number = int(os.environ["HF_REVISION"].removeprefix("refs/pr/"))
+          HfApi().merge_pull_request(os.environ["HF_DATASET"], number, repo_type="dataset")
+          '
+      - name: Confirm the merged dataset holds the checked archive
+        run: |
+          uvx --from huggingface_hub hf download "$HF_DATASET" "$EXPERIMENT_ID.zip" \
+            --repo-type dataset --local-dir "$RUNNER_TEMP/merged"
+          cmp "$RUNNER_TEMP/download/$EXPERIMENT_ID.zip" "$RUNNER_TEMP/merged/$EXPERIMENT_ID.zip"
+      - name: Release the checked archive and commit the lock
+        run: |
+          tag="atlases-$(date -u +%Y%m%d)"
+          previous=$(uv run python -c "import json; print(json.load(open('site/atlases.lock.json'))['release'])")
+          mkdir assets
+          gh release download "$previous" --pattern '*.zip' --dir assets
+          cp "$RUNNER_TEMP/download/$EXPERIMENT_ID.zip" assets/
+          gh release create "$tag" assets/*.zip --title "$tag" --notes "Adds $EXPERIMENT_ID."
+          uv run python scripts/publish_experiment.py lock "$EXPERIMENT_ID" \
+            "assets/$EXPERIMENT_ID.zip" --release "$tag"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site/atlases.lock.json
+          git commit -m "Publish $EXPERIMENT_ID in $tag"
+          git push

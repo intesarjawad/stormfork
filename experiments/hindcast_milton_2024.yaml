@@ -1,0 +1,9 @@
+id: hindcast_milton_2024
+title: Hurricane Milton hindcast from three initial times
+kind: hindcast
+storm: 2024279N21265
+init: [2024-10-04T00:00Z, 2024-10-06T00:00Z, 2024-10-08T00:00Z]
+source: era5
+seeds: {baseline: 0, control: 1000}
+limits:
+  - "Initial conditions are reconstructed from ERA5 reanalysis, not the analysis available at the time, so a hindcast shows what the model does from a reconstructed state and is not the forecast it would have issued then."

@@ -1,0 +1,12 @@
+{
+  "source_url": "https://www.ncei.noaa.gov/data/international-best-track-archive-for-climate-stewardship-ibtracs/v04r01/access/csv/ibtracs.NA.list.v04r01.csv",
+  "version": "v04r01",
+  "retrieved": "2026-11-05",
+  "source_sha256": "666681be5b12caf5bad7a511bae5f6e5fa8b03789f7f6dd00ee2f0aaa41c2c97",
+  "fixture_sha256": "f9d0c3c1edc0c82e30b7c05289f0a6616710f6a45c960a65f9c7fe94221a2f2a",
+  "selection": {
+    "SID": "2005236N23285",
+    "ISO_TIME": "2005-08-24 12:00:00"
+  },
+  "column_documentation": "https://www.ncei.noaa.gov/sites/default/files/2025-09/IBTrACS_v04r01_column_documentation.pdf"
+}

@@ -1,0 +1,18 @@
+id: katrina_scale_0p7
+title: Hurricane Katrina, intensity scaled to 0.7 of the extracted anomaly
+kind: fork
+storm: 2005236N23285
+# The core is 185 km from land at this init; one cycle earlier it was over Florida.
+init: 2005-08-27T00:00Z
+source: era5
+edit:
+  type: scale_intensity
+  params:
+    factor: 0.7
+taper:
+  centre: [24.6, -83.3]
+  radius_km: 400.0
+seeds: {baseline: 0, control: 1000}
+limits:
+  - "This storm is inside the model's training period (data through 2023), so the baseline is not an independent forecast; the fork shows how the trained model responds to the edit."
+  - "The factor scales the extracted storm anomaly inside the taper; the 0.5 to 1.5 range is a chosen limit, not a calibrated one."

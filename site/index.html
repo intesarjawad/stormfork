@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#1d2290" />
+    <meta
+      name="description"
+      content="Move a real storm's starting position, rerun an AI weather model ensemble, and compare the fork with the original and with a control using paired statistics."
+    />
+    <meta property="og:title" content="Stormfork" />
+    <meta
+      property="og:description"
+      content="Move a real storm's starting position and test whether the model moved more than its own noise."
+    />
+    <meta property="og:image" content="social-preview.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <title>Stormfork</title>
+    <link rel="stylesheet" href="/src/style/site.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231d2290'/%3E%3Cpath d='M16 28V17M16 17 8 5M16 17l8-12' stroke='%23ece6d6' stroke-width='3' fill='none'/%3E%3Cpath d='M24 5l-3 9' stroke='%23ece6d6' stroke-width='3'/%3E%3C/svg%3E"
+    />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="bar">
+      <a class="mark" href="#/" aria-label="Stormfork, home">
+        <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true">
+          <path d="M16 29V17" class="mark-stem" />
+          <path d="M16 17 6 3" class="mark-tine" />
+          <path d="M16 17 26 3" class="mark-tine mark-fork" />
+        </svg>
+        <span>Stormfork</span>
+        <small class="card-url">github.com/intesarjawad/stormfork</small>
+      </a>
+      <nav aria-label="Sections">
+        <a href="#/" data-nav="home">Fork</a>
+        <a href="#/e/sandy_east_300km" data-nav="atlas">Atlas</a>
+        <a href="#/scores" data-nav="scores">Scores</a>
+        <a href="#/how" data-nav="how">Method</a>
+      </nav>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <p id="summary" role="status">Reading the experiment.</p>
+      <p id="notice-link" hidden>
+        The files also live on the
+        <a href="https://github.com/intesarjawad/stormfork/releases">releases page</a>.
+      </p>
+
+      <section id="landing" hidden>
+        <div id="hero" class="spread" data-state="loading">
+          <section id="scene" class="scene" aria-labelledby="scene-title">
+            <h2 id="scene-title" class="sr-only">The relief</h2>
+            <canvas
+              id="relief"
+              role="img"
+              aria-label="Sea-level pressure of one member drawn as a relief seen from the south, the storm a pit in it, with every member's track burnt in. The same facts are in the ledger beside it."
+            ></canvas>
+            <img
+              id="relief-still"
+              src="relief-still.png"
+              alt="Sea-level pressure of one member drawn as a relief seen from the south, with every member's track. The same facts are in the ledger beside it."
+              hidden
+            />
+            <div id="tags" class="tags" aria-hidden="true"></div>
+            <div class="watch">
+              <svg
+                id="dial"
+                class="dial"
+                viewBox="-70 -70 140 140"
+                tabindex="0"
+                role="slider"
+                aria-label="Six-hour step of the forecast"
+                aria-valuemin="0"
+                aria-valuemax="40"
+                aria-valuenow="0"
+              ></svg>
+              <div class="when">
+                <p id="when" class="when-time"></p>
+                <p id="stepline" class="when-step"></p>
+                <div class="toggle" role="group" aria-label="Relief shows">
+                  <button id="run-baseline" type="button" aria-pressed="true">
+                    As the model ran it
+                  </button>
+                  <button id="run-fork" type="button" aria-pressed="false">Moved east</button>
+                </div>
+                <button id="landing-play" class="play" type="button" aria-pressed="false">
+                  Play
+                </button>
+              </div>
+            </div>
+            <p class="caption"><span id="caption"></span><span>Not a forecast</span></p>
+            <div id="plate-error" class="plate-error state" role="alert" hidden>
+              <p class="label">The run is not in this build</p>
+              <p>
+                The page reads the exported Sandy run from <code>experiments/</code>. Fetch it, then
+                reload.
+              </p>
+              <pre class="cmd"><code>uv run python scripts/fetch_atlases.py</code></pre>
+              <details>
+                <summary>Technical detail</summary>
+                <p id="plate-error-detail"></p>
+              </details>
+            </div>
+          </section>
+
+          <section class="book" aria-labelledby="book-title">
+            <h1 id="book-title">The fate of <i data-fill="storms">twenty-four</i> storms</h1>
+            <p class="lede">
+              Hurricane Sandy from <span data-fill="start"></span>, run three times by
+              <span data-fill="modelName"></span>, <span data-fill="members"></span> members each:
+              as the model ran it, with the storm moved <span data-fill="edit"></span> km east, and
+              again with new seeds. Turn the watch to fill the ledger;
+              <span class="key-cross" aria-hidden="true"></span
+              ><span class="sr-only">a cross </span>marks a storm the tracker no longer follows.
+            </p>
+            <table class="fates">
+              <caption class="sr-only">
+                Fate of each member at the step the watch shows
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">Member</th>
+                  <th scope="col">Fate</th>
+                  <th scope="col">Last seen</th>
+                  <th scope="col">hPa</th>
+                </tr>
+              </thead>
+              <tbody id="fates"></tbody>
+            </table>
+            <div class="verdict" aria-live="polite">
+              <ol id="cells" class="cells" aria-hidden="true"></ol>
+              <p class="cells-key">
+                One square a step. The test runs while <span data-fill="minPairs"></span> or more
+                pairs remain; <span id="pairs-now"></span>.
+              </p>
+              <p id="stamp" class="stamp"></p>
+              <p id="verdict" class="verdict-text"></p>
+              <p id="figures" class="figures"></p>
+            </div>
+            <p class="actions">
+              Every member's track is in <a href="#/e/sandy_east_300km">the atlas</a>; the test is
+              set out under <a href="#/how">method</a>.
+            </p>
+          </section>
+        </div>
+
+        <div class="story">
+          <section class="block block-ledger" aria-labelledby="runs-title">
+            <div class="block-head">
+              <p class="label">Three runs, one edit</p>
+              <h2 id="runs-title">Each run answers a different question.</h2>
+            </div>
+            <div class="block-body">
+              <table class="ledger">
+                <thead>
+                  <tr>
+                    <th scope="col">Run</th>
+                    <th scope="col">What changes</th>
+                    <th scope="col">Members</th>
+                    <th scope="col">Seed</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">
+                      <svg class="swatch" viewBox="0 0 48 12" aria-hidden="true">
+                        <line x1="0" x2="48" y1="6" y2="6" class="sw-baseline" />
+                        <circle cx="24" cy="6" r="3.6" class="sw-baseline-dot" />
+                      </svg>
+                      Baseline
+                    </th>
+                    <td>Nothing. The model's forecast from the ERA5 analysis.</td>
+                    <td data-label="Members" data-fill="members"></td>
+                    <td data-label="Seed" data-fill="seedBaseline"></td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      <svg class="swatch" viewBox="0 0 48 12" aria-hidden="true">
+                        <line x1="0" x2="48" y1="6" y2="6" class="sw-fork" />
+                        <path d="M24 1 L29 6 L24 11 L19 6 Z" class="sw-fork-dot" />
+                      </svg>
+                      Fork
+                    </th>
+                    <td>
+                      The storm's starting position, moved <span data-fill="edit"></span> km east.
+                      Same seeds as the baseline.
+                    </td>
+                    <td data-label="Members" data-fill="members"></td>
+                    <td data-label="Seed" data-fill="seedBaseline"></td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      <svg class="swatch" viewBox="0 0 48 12" aria-hidden="true">
+                        <line x1="0" x2="48" y1="6" y2="6" class="sw-control" />
+                      </svg>
+                      Control
+                    </th>
+                    <td>
+                      The unedited start with other seeds. It shows how far the model moves on its
+                      own.
+                    </td>
+                    <td data-label="Members" data-fill="members"></td>
+                    <td data-label="Seed" data-fill="seedControl"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="block block-figure" aria-labelledby="noise-title">
+            <p class="label">Signal against noise</p>
+            <h2 id="noise-title">
+              The fork separated from the control on
+              <span data-fill="separated"></span> of <span data-fill="tested"></span> tested steps.
+            </h2>
+            <p class="deck">
+              Each cell below the curves is one six-hour step. Filled means the one-sided exact
+              Wilcoxon test over the matched members put the fork farther from the baseline than the
+              control, at p of <span data-fill="level"></span> or less. Hollow means it did not, and
+              a cross means fewer than <span data-fill="minPairs"></span> members were matched, so
+              the test did not run. At its widest the fork sat <span data-fill="peak"></span> km
+              from the baseline.
+            </p>
+            <div class="figure-frame">
+              <svg
+                id="separation-chart"
+                role="img"
+                aria-label="Separation from the baseline by step, for the fork and for the control, on a square-root kilometre scale, with the outcome of the paired test under each step."
+              ></svg>
+            </div>
+            <ul class="key" aria-label="Chart key">
+              <li>
+                <svg viewBox="0 0 48 12" aria-hidden="true">
+                  <line x1="0" x2="48" y1="6" y2="6" class="sw-fork" /></svg
+                >Fork from baseline
+              </li>
+              <li>
+                <svg viewBox="0 0 48 12" aria-hidden="true">
+                  <line x1="0" x2="48" y1="6" y2="6" class="sw-control" /></svg
+                >Control from baseline
+              </li>
+              <li>
+                <svg viewBox="0 0 12 12" aria-hidden="true">
+                  <rect
+                    x="1"
+                    y="1"
+                    width="10"
+                    height="10"
+                    class="cell-key cell-key-separated"
+                  /></svg
+                >Separated
+              </li>
+              <li>
+                <svg viewBox="0 0 12 12" aria-hidden="true">
+                  <rect
+                    x="1.5"
+                    y="1.5"
+                    width="9"
+                    height="9"
+                    class="cell-key cell-key-within"
+                  /></svg
+                >Within noise
+              </li>
+              <li>
+                <svg viewBox="0 0 12 12" aria-hidden="true">
+                  <path d="M2 2 L10 10 M10 2 L2 10" class="cell-key cell-key-few" /></svg
+                >Too few pairs
+              </li>
+            </ul>
+            <details class="data">
+              <summary>Every step as a table</summary>
+              <table id="steps-table" class="ledger ledger-dense">
+                <caption class="sr-only">
+                  Separation from the baseline and paired test, by step
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Step</th>
+                    <th scope="col">Valid</th>
+                    <th scope="col">Fork km</th>
+                    <th scope="col">Control km</th>
+                    <th scope="col">Pairs</th>
+                    <th scope="col">Paired p</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </details>
+          </section>
+
+          <section class="block block-atlas" aria-labelledby="atlas-title">
+            <div class="block-head">
+              <p class="label">The atlas</p>
+              <h2 id="atlas-title">Every field, every run, on a globe you can turn.</h2>
+            </div>
+            <div class="block-body">
+              <p class="deck">
+                Sea-level pressure, 10 m wind, 2 m temperature, 500 hPa geopotential and six-hour
+                rain, for the baseline, the fork and the control, at
+                <span data-fill="frames"></span> steps. Switch on the difference layer to see only
+                what the edit changed.
+              </p>
+              <p class="actions">
+                <a class="button button-solid" href="#/e/sandy_east_300km">Open the atlas</a>
+              </p>
+            </div>
+          </section>
+
+          <section class="block block-limits" aria-labelledby="limits-title">
+            <div class="block-head">
+              <p class="label">Read this first</p>
+              <h2 id="limits-title">What this run cannot tell you.</h2>
+            </div>
+            <div class="block-body">
+              <ol id="limits" class="limits"></ol>
+              <dl class="provenance">
+                <div>
+                  <dt>Model</dt>
+                  <dd data-fill="model"></dd>
+                </div>
+                <div>
+                  <dt>Checkpoint</dt>
+                  <dd data-fill="checkpoint"></dd>
+                </div>
+                <div>
+                  <dt>Checkpoint md5</dt>
+                  <dd class="mono" data-fill="md5"></dd>
+                </div>
+                <div>
+                  <dt>Run on</dt>
+                  <dd data-fill="device"></dd>
+                </div>
+                <div>
+                  <dt>Exported</dt>
+                  <dd data-fill="created"></dd>
+                </div>
+              </dl>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section id="atlas" hidden>
+        <div class="atlas-grid">
+          <div class="stage">
+            <div id="globe-panel" role="group" aria-label="Experiment globe"></div>
+            <div id="fallback" hidden>
+              <div class="notice">
+                <p class="label">No WebGL here</p>
+                <p>
+                  The globe needs WebGL. The <a href="#/how">method</a> and
+                  <a href="#/scores">scores</a> pages and the
+                  <a href="https://github.com/intesarjawad/stormfork/releases">releases page</a>
+                  still work.<span id="fallback-error"></span>
+                </p>
+              </div>
+            </div>
+            <ul id="legend" class="legend" aria-label="Runs on the globe"></ul>
+            <div id="field-legend" class="field-legend" hidden></div>
+            <p class="camera-help">Focus the globe: arrow keys rotate; + / − zoom.</p>
+            <div id="stage-state" class="state" role="status" hidden></div>
+            <div id="honesty" class="honesty" role="note" hidden>
+              <p class="label">Not a forecast</p>
+              <p>
+                This is the model reacting to an edit. For decisions about a storm follow the
+                National Hurricane Center and your local NWS office.
+              </p>
+              <button id="honesty-dismiss" type="button" class="button">Understood</button>
+            </div>
+          </div>
+
+          <form id="controls" class="panel" hidden aria-label="Experiment controls">
+            <button
+              id="sheet-toggle"
+              class="sheet-handle"
+              type="button"
+              aria-expanded="false"
+              aria-controls="control-fields"
+            >
+              <span>Controls</span>
+              <output id="sheet-time"></output>
+            </button>
+            <div id="control-fields">
+              <fieldset>
+                <legend>View</legend>
+                <p>
+                  <label for="layer">Field</label>
+                  <select id="layer"></select>
+                </p>
+                <p>
+                  <label for="run">Run</label>
+                  <select id="run"></select>
+                </p>
+                <p id="lead-field" hidden>
+                  <label for="lead">Lead time</label>
+                  <select id="lead"></select>
+                </p>
+                <p class="check">
+                  <input id="difference" type="checkbox" />
+                  <label for="difference">Difference from baseline</label>
+                </p>
+              </fieldset>
+              <fieldset>
+                <legend>Time</legend>
+                <p>
+                  <label for="frame"
+                    >Step <output id="frame-value" for="frame">Day 1, 00:00 UTC</output></label
+                  >
+                  <input id="frame" type="range" min="0" max="40" step="1" value="0" />
+                </p>
+                <p>
+                  <button id="atlas-play" class="button" type="button" aria-pressed="false">
+                    Play
+                  </button>
+                </p>
+              </fieldset>
+              <fieldset id="displacement-field" hidden>
+                <legend>Displacement</legend>
+                <p>
+                  <label for="displacement"
+                    >Starting position <output id="displacement-value" for="displacement"></output
+                  ></label>
+                  <input id="displacement" type="range" min="0" max="0" step="1" value="0" />
+                </p>
+              </fieldset>
+              <fieldset>
+                <legend>Readout</legend>
+                <p id="divergence" role="status"></p>
+                <svg
+                  id="sparkline"
+                  viewBox="0 0 240 48"
+                  role="img"
+                  aria-label="Fork and control separation by step"
+                  hidden
+                ></svg>
+              </fieldset>
+            </div>
+          </form>
+        </div>
+
+        <section id="tracks-section" class="notes">
+          <h2>Reading the tracks</h2>
+          <p>
+            Thin lines are single members. Thick lines are ensemble means, drawn only where
+            <span data-fill="minPairs"></span> or more members were matched. A baseline line is
+            solid, fork members are dashed and fork means carry diamond marks, and a control line is
+            dotted, so the runs stay apart without colour.
+          </p>
+          <p id="reproductions" hidden></p>
+        </section>
+        <section id="sweep-chart-section" class="notes" hidden>
+          <h2>Landfall latitude by displacement</h2>
+          <svg
+            id="sweep-chart"
+            viewBox="0 0 480 240"
+            role="img"
+            aria-label="Landfall latitude of each fork member against how far the storm was moved, with the control spread as a band"
+          ></svg>
+          <p id="sweep-chart-readout" role="status"></p>
+        </section>
+      </section>
+
+      <section id="scoreboard" class="page" hidden>
+        <p class="label">Scores</p>
+        <h2>Which model was closer, town by town.</h2>
+        <div id="scores-state" class="state" role="status" hidden></div>
+        <button id="scores-retry" type="button" class="button" hidden>Retry scores</button>
+        <p id="scoreboard-status" role="status"></p>
+        <p class="filters">
+          <label for="scoreboard-variable">Variable</label>
+          <select id="scoreboard-variable"></select>
+          <label for="scoreboard-lead">Lead time</label>
+          <select id="scoreboard-lead"></select>
+        </p>
+        <p class="score-scroll-hint">Scroll to see all models →</p>
+        <div class="table-wrap">
+          <table id="scoreboard-table" class="ledger">
+            <caption id="scoreboard-caption"></caption>
+            <thead></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p>
+          <a id="scoreboard-fault-link" href="issues?q=label%3Adata-fault"
+            >Open data-fault issues</a
+          >
+        </p>
+      </section>
+
+      <section id="how" class="page" hidden>
+        <p class="label">Method</p>
+        <h2>One edit, three runs, one question.</h2>
+        <p class="diagram-hint">Scroll horizontally to see the full diagram.</p>
+        <div
+          class="diagram-wrap"
+          tabindex="0"
+          role="region"
+          aria-label="Method diagram, scroll horizontally"
+        >
+          <svg
+            class="how-diagram"
+            viewBox="0 0 720 220"
+            role="img"
+            aria-label="One analysis at the start splits into three runs: the baseline keeps the start, the fork moves the start, and the control keeps the start with new seeds. The fork is compared with the baseline and read against the control."
+          >
+            <circle cx="40" cy="110" r="7" class="hd-start" />
+            <text x="22" y="146" class="hd-label">Analysis</text>
+            <path d="M47 110 C140 110 170 40 330 40 L560 40" class="hd-line hd-baseline" />
+            <path d="M47 110 C140 110 170 110 330 110 L560 110" class="hd-line hd-control" />
+            <path d="M47 110 C140 110 170 180 330 180 L560 180" class="hd-line hd-fork" />
+            <circle cx="330" cy="40" r="4.5" class="hd-dot hd-baseline-dot" />
+            <path d="M330 173 l7 7 l-7 7 l-7 -7 z" class="hd-fork-dot" />
+            <text x="572" y="44" class="hd-run">Baseline</text>
+            <text x="572" y="114" class="hd-run">Control</text>
+            <text x="572" y="184" class="hd-run">Fork</text>
+            <text x="330" y="20" text-anchor="middle" class="hd-note">same start, seeds 0</text>
+            <text x="330" y="94" text-anchor="middle" class="hd-note">same start, other seeds</text>
+            <text x="330" y="212" text-anchor="middle" class="hd-note">start moved, seeds 0</text>
+          </svg>
+        </div>
+        <div class="prose">
+          <p>
+            Each experiment starts from one analysis of a storm and changes one thing: its starting
+            position, its intensity, the sea surface temperature or a little noise. The model then
+            runs from the same initial time three times: the original forecast, the edited forecast
+            and a control.
+          </p>
+          <p>
+            The control keeps the unedited starting state and uses different random seeds. It shows
+            how far the model's own variability moves a forecast. Compare the edited forecast with
+            the control before reading a difference as an effect of the edit.
+          </p>
+          <p>
+            For each step the page tests, member by member, whether the fork's distance from the
+            baseline exceeds the control's. The test is a one-sided exact Wilcoxon signed-rank test
+            and needs <span data-fill="minPairs"></span> matched members; the level is
+            <span data-fill="level"></span>.
+          </p>
+          <p>
+            A hindcast has no edit. It starts from ERA5 reanalysis, so it shows what the model does
+            from a reconstructed state, not the forecast it would have issued at the time.
+          </p>
+          <p>
+            Storms before 2024 are inside the model's training period (data through 2023), so their
+            baseline is not an independent forecast. Each experiment's manifest lists its limits.
+          </p>
+          <p>
+            These are precomputed experiments, not live forecasts. They show how the model responds
+            to an edit, not what a real storm would do. The method, the edit limits and how to write
+            your own experiment are in the repository's docs folder.
+          </p>
+        </div>
+      </section>
+
+      <section id="missing" class="page" hidden>
+        <p class="label">Not found</p>
+        <h2>That address leads nowhere.</h2>
+        <p>
+          The page you asked for is not part of this site. Start from the
+          <a href="#/">fork</a>, the <a href="#/e/sandy_east_300km">atlas</a> or the
+          <a href="#/how">method</a>.
+        </p>
+      </section>
+    </main>
+
+    <footer id="site-footer" class="foot">
+      <p>
+        Not a forecast. For decisions follow the
+        <a href="https://www.nhc.noaa.gov/">National Hurricane Center (nhc.noaa.gov)</a>
+        and your local NWS office.
+      </p>
+      <p class="foot-meta">
+        <a href="https://github.com/intesarjawad/stormfork">Source on GitHub</a>
+        <span>Coastlines from Natural Earth, public domain</span>
+      </p>
+    </footer>
+    <template id="record-content">
+      <svg viewBox="0 0 24 24" width="32" height="32" aria-hidden="true">
+        <path
+          d="M4 2 L4 20 L9 15 L12 22 L15 20 L12 14 L19 14 Z"
+          fill="#111111"
+          stroke="#ffffff"
+          stroke-width="1.5"
+        />
+      </svg>
+      <p>Drag the storm</p>
+    </template>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

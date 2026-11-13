@@ -1,0 +1,15 @@
+name: CodeQL
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+  security-events: write
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: github/codeql-action/init@v4
+        with: { languages: python }
+      - uses: github/codeql-action/analyze@v4

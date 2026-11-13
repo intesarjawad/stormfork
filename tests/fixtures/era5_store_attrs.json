@@ -1,0 +1,10 @@
+{
+  "source_url": "https://storage.googleapis.com/gcp-public-data-arco-era5/ar/full_37-1h-0p25deg-chunk-1.zarr-v3/.zattrs",
+  "retrieved": "2026-11-07",
+  "attributes": {
+    "last_updated": "2026-11-06 16:02:41.103549+00:00",
+    "valid_time_start": "1940-01-01",
+    "valid_time_stop": "2026-06-30",
+    "valid_time_stop_era5t": "2026-10-31"
+  }
+}

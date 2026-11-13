@@ -1,0 +1,744 @@
+/* The spread: the relief on the left page, the ledger on the right. */
+.spread {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(25rem, 1fr);
+  height: calc(100svh - var(--bar));
+  min-height: 46rem;
+  max-height: 64rem;
+  border-bottom: 1px solid var(--ink);
+}
+
+.scene {
+  position: relative;
+  overflow: hidden;
+  border-right: 1px solid var(--ink);
+  background: var(--ground);
+}
+
+.scene canvas,
+.scene img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+
+.tags {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.tag-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.tag-lines line {
+  stroke: var(--ink);
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+/* A leader is knocked out of the relief so it reads over any dither. */
+.tag-lines line.knock {
+  stroke: var(--ground);
+  stroke-width: 5;
+}
+
+.tag {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 0;
+  padding: 1px 6px 2px;
+  background: var(--ground);
+  font: 13px/1.2 var(--display);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  translate: 0 -50%;
+}
+
+/* A ring's value, set on the ring with the relief knocked out round it, so the ring breaks. */
+.ring-value {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 0;
+  padding: 0 3px;
+  background: var(--ground);
+  font: 10px/1.2 var(--mono);
+  translate: -50% -50%;
+}
+
+.exit-value {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 0;
+  padding: 0 3px;
+  background: var(--ground);
+  font: 11px/1.2 var(--mono);
+  white-space: nowrap;
+  translate: -50% -50%;
+}
+
+.exit-value[data-side="left"] {
+  translate: -100% -50%;
+}
+
+.exit-value[data-side="right"] {
+  translate: 0 -50%;
+}
+
+.tag[data-side="left"] {
+  translate: -100% -50%;
+}
+
+/* The pocket watch and the controls it carries, on a plate knocked out of the relief. */
+.watch {
+  position: absolute;
+  left: var(--s-4);
+  top: var(--s-4);
+  display: flex;
+  gap: var(--s-4);
+  align-items: center;
+  padding: var(--s-3) var(--s-6) var(--s-3) var(--s-3);
+  border: 1px solid var(--ink);
+  background: var(--ground);
+}
+
+.dial {
+  width: 8.25rem;
+  height: 8.25rem;
+  flex: none;
+  cursor: grab;
+  border-radius: 50%;
+  touch-action: none;
+}
+
+.dial:active {
+  cursor: grabbing;
+}
+
+.dial:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+}
+
+.dial-face {
+  fill: var(--ground);
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+
+.dial-rim {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 0.6;
+}
+
+.dial-tick {
+  stroke: var(--ink);
+  stroke-width: 0.7;
+}
+
+.dial-tick.major {
+  stroke-width: 1.6;
+}
+
+.dial text {
+  fill: var(--ink);
+  font: 9px var(--mono);
+  text-anchor: middle;
+}
+
+.dial-tested {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 3;
+}
+
+.dial-hand {
+  stroke: var(--ink);
+  stroke-width: 2.2;
+  stroke-linecap: square;
+}
+
+.dial-pin {
+  fill: var(--ink);
+}
+
+.when p {
+  margin: 0;
+}
+
+.when-time {
+  font: 22px/1.15 var(--mono);
+}
+
+.when-step {
+  font: 12px/1.6 var(--mono);
+}
+
+/* A fixed measure, so the plate never resizes as the time, the step or the run changes. */
+.when {
+  width: 19.5rem;
+}
+
+.toggle {
+  display: flex;
+  gap: var(--s-4);
+  margin-top: var(--s-1);
+}
+
+.toggle button,
+.play {
+  min-height: 1.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--ink);
+  font: 17px/1 var(--display);
+  text-decoration: underline dotted 1px;
+  text-underline-offset: 5px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.toggle button[aria-pressed="true"] {
+  text-decoration: underline solid 2px;
+}
+
+.toggle button:hover,
+.play:hover {
+  text-decoration-style: solid;
+}
+
+/* Play is a drawn triangle, pause two bars: glyphs in the ink, not icons. */
+.play {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  text-decoration: none;
+}
+
+.play::before {
+  content: "";
+  box-sizing: content-box;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 5px 0 5px 8px;
+  border-color: transparent transparent transparent currentcolor;
+}
+
+.play[aria-pressed="true"]::before {
+  width: 3px;
+  height: 10px;
+  border-width: 0 3px;
+  border-color: currentcolor;
+}
+
+.play:hover {
+  text-decoration: underline solid 1px;
+}
+
+.caption {
+  position: absolute;
+  left: var(--s-4);
+  right: var(--s-4);
+  bottom: var(--s-4);
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-4);
+  margin: 0;
+  font: italic 14px/1.4 var(--display);
+}
+
+.caption span {
+  padding: 1px 6px 2px;
+  background: var(--ground);
+}
+
+.plate-error {
+  position: absolute;
+  inset: auto var(--s-6) var(--s-12) var(--s-6);
+  max-width: 34rem;
+  padding: var(--s-6);
+  background: var(--ground);
+  outline: 1px solid var(--ink);
+}
+
+/* The ledger page. */
+.book {
+  container: ledger / inline-size;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: var(--s-6) var(--s-8) var(--s-4);
+  overflow: hidden;
+}
+
+.book h1 {
+  margin: 0;
+  font: 400 2.25rem/1 var(--display);
+  letter-spacing: -0.005em;
+}
+
+.book .lede {
+  max-width: 60ch;
+  margin: var(--s-2) 0 var(--s-3);
+  font: 1rem/1.3 var(--text);
+}
+
+/* Fixed columns, so no figure moves between instants; the fate takes what the others leave. */
+.fates {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font: 13px/1.16 var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.fates th:nth-child(1) {
+  width: 4.75rem;
+}
+
+.fates th:nth-child(3) {
+  width: 7.5rem;
+}
+
+.fates th:nth-child(4) {
+  width: 2.75rem;
+}
+
+.fates th:nth-child(4),
+.fates td:nth-child(4) {
+  padding-right: 0;
+  text-align: right;
+}
+
+.fates th {
+  padding: 0 var(--s-2) 2px 0;
+  border-bottom: 1px solid var(--ink);
+  font: italic 15px/1.2 var(--display);
+  text-align: left;
+}
+
+.fates td {
+  padding: 0 var(--s-2) 0 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.fates th:first-child,
+.fates tr:not(.group) td:first-child {
+  padding-left: 6px;
+}
+
+/* Narrow: the table steps down to the pixel face's own 11 px, one size in every cell. A
+   fate whose date will not fit beside it takes a second line rather than a smaller face. */
+@container ledger (max-width: 27rem) {
+  .fates tr:not(.group) td {
+    font-size: 11px;
+  }
+
+  .fates td:nth-child(2) {
+    white-space: normal;
+  }
+
+  .fate-when {
+    white-space: nowrap;
+  }
+
+  .fates th:nth-child(1) {
+    width: 4.5rem;
+  }
+
+  .fates th:nth-child(3) {
+    width: 6.25rem;
+  }
+
+  .fates th:nth-child(4) {
+    width: 2.25rem;
+  }
+
+  .fates .group-count {
+    display: block;
+    margin-left: 0;
+  }
+
+  .fates .group-count::before {
+    content: none;
+  }
+}
+
+.fates .group td {
+  padding-top: var(--s-2);
+  white-space: normal;
+  font: italic 1rem/1.3 var(--display);
+}
+
+.group-count {
+  margin-left: var(--s-2);
+  font: 13px var(--mono);
+  font-style: normal;
+}
+
+.group-count::before {
+  content: "· ";
+}
+
+.who {
+  padding: 0 3px;
+  margin-left: -3px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: crosshair;
+}
+
+/* A lost storm's cross, as the ledger's clerk would mark it; the room is kept for every row. */
+.who::after,
+.key-cross {
+  content: "";
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-left: 7px;
+  visibility: hidden;
+  background:
+    linear-gradient(45deg, transparent 43%, currentcolor 43% 57%, transparent 57%),
+    linear-gradient(-45deg, transparent 43%, currentcolor 43% 57%, transparent 57%);
+}
+
+/* A storm the tracker has lost: full ink, its fate word struck, a dotted rule under the row. */
+.fates tr.gone .who::after {
+  visibility: visible;
+}
+
+.fates tr.gone td {
+  background: linear-gradient(90deg, var(--ink) 1px, transparent 1px) 0 100% / 3px 1px repeat-x;
+}
+
+.fates tr.gone .fate-word {
+  text-decoration: line-through 1px var(--ink);
+}
+
+/* The pointer's row gets a bar in the margin; only an event fills a row. */
+.fates tr.focused td:first-child {
+  box-shadow: inset 2px 0 var(--ink);
+}
+
+/* The stamp: the paired test confirms only when enough pairs agree. */
+.verdict {
+  display: grid;
+  flex: none;
+  grid-template-columns: 12rem 1fr;
+  grid-template-rows: auto auto auto 1fr;
+  gap: var(--s-2) var(--s-4);
+  align-items: start;
+  /* Held at one height so the stamp never shifts as the text changes; it grows only on a
+     ledger too narrow to set the figures in that room, where the column scrolls anyway. */
+  min-height: 10rem;
+  margin-top: auto;
+  padding-top: var(--s-4);
+  overflow: hidden;
+  border-top: 1px solid var(--ink);
+}
+
+.stamp {
+  justify-self: start;
+  margin: var(--s-1) 0 0;
+  padding: 6px 9px 5px;
+  border: 2px solid var(--ink);
+  font: 15px/1.2 var(--mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transform: rotate(-3deg);
+}
+
+.stamp[data-verdict="within-noise"],
+.stamp[data-verdict="too-few-pairs"] {
+  border-style: dashed;
+}
+
+/* Before the fates split the stamp is only an outline, laid flat: the test holds, but on
+   the edit alone. */
+.stamp[data-early] {
+  border-style: dotted;
+  transform: none;
+}
+
+/* The test has closed: the verdict stays inked, and only the border changes. */
+.stamp[data-closed] {
+  border-style: double;
+  border-width: 4px;
+}
+
+.stamp small {
+  display: block;
+  margin-top: 2px;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}
+
+.verdict-text {
+  margin: 0;
+  font: 1rem/1.3 var(--text);
+  text-wrap: pretty;
+}
+
+/* Prose, not a readout: the pixel face's comma reads as a full stop at this size. */
+.figures {
+  grid-column: 1 / -1;
+  margin: 0;
+  font: italic 13px/1.35 var(--text);
+  text-wrap: pretty;
+}
+
+/* One cell per step: filled, confirmed; hollow, not confirmed; a dot, no test. */
+/* Above the stamp, so the two never drift apart. */
+.cells {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(41, 1fr);
+  gap: 2px;
+  margin: 0 0 var(--s-1);
+  padding: 0;
+  list-style: none;
+}
+
+.cells-key {
+  grid-column: 1 / -1;
+  margin: calc(var(--s-1) * -1) 0 0;
+  font: italic 13px/1.25 var(--display);
+}
+
+/* The count never wraps away from its words. */
+#pairs-now {
+  white-space: nowrap;
+}
+
+.key-cross {
+  margin: 0 3px 0 0;
+  visibility: visible;
+}
+
+.cells li {
+  position: relative;
+  aspect-ratio: 1;
+  max-height: 9px;
+  box-shadow: inset 0 0 0 1px var(--ink);
+}
+
+.cells li[data-verdict="separated"] {
+  background: var(--ink);
+}
+
+.cells li[data-verdict="too-few-pairs"] {
+  box-shadow: none;
+  background: radial-gradient(circle, var(--ink) 1px, transparent 1.5px);
+}
+
+.cells li.now::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -5px;
+  width: 1px;
+  height: calc(100% + 10px);
+  background: var(--ink);
+  outline: 1px solid var(--ground);
+}
+
+.book .actions {
+  margin: var(--s-2) 0 0;
+  font: italic 15px/1.4 var(--display);
+}
+
+/* The social card: the spread alone, at the card's size. */
+html[data-route="card"] .foot,
+html[data-route="card"] .bar nav,
+html[data-route="card"] .story,
+html[data-route="card"] #summary,
+html[data-route="card"] .skip,
+html[data-route="card"] .book .actions,
+html[data-route="card"] .play,
+html[data-route="card"] .caption span:first-child {
+  display: none;
+}
+
+/* The card carries the name and where to find it, on a plate in the relief's corner. */
+html[data-route="card"] .bar {
+  position: absolute;
+  top: auto;
+  left: 0;
+  bottom: 0;
+  gap: var(--s-3);
+  z-index: 3;
+  height: auto;
+  padding: var(--s-2) var(--s-4) var(--s-3);
+  border: 0;
+  background: var(--ground);
+}
+
+html[data-route="card"] .card-url {
+  display: block;
+  font: 12px var(--mono);
+  font-weight: 400;
+}
+
+html[data-route="card"] .caption {
+  justify-content: flex-end;
+}
+
+html[data-route="card"] .cells,
+html[data-route="card"] .cells-key {
+  display: none;
+}
+
+html[data-route="card"] .spread {
+  width: 1280px;
+  height: 640px;
+  min-height: 0;
+  grid-template-columns: 760px 1fr;
+}
+
+/* The card keeps the whole ledger: twenty-four fates at the rest step, beside the relief. */
+html[data-route="card"] .book {
+  padding: var(--s-4) var(--s-6) var(--s-4);
+}
+
+html[data-route="card"] .book h1 {
+  font-size: 2rem;
+}
+
+html[data-route="card"] .book .lede,
+html[data-route="card"] .figures {
+  display: none;
+}
+
+html[data-route="card"] .fates {
+  margin-top: var(--s-3);
+  font-size: 12px;
+  line-height: 1.16;
+}
+
+html[data-route="card"] .fates .group td {
+  font-size: 14px;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+html[data-route="card"] .group-count {
+  font-size: 11px;
+}
+
+html[data-route="card"] .verdict {
+  height: auto;
+  grid-template-rows: auto;
+}
+
+@media (max-width: 959px) {
+  .spread {
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+  }
+
+  .scene {
+    height: min(118vw, 34rem);
+    border-right: 0;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .watch {
+    left: 0;
+    right: 0;
+    top: 0;
+    border-width: 0 0 1px;
+    gap: var(--s-3);
+    padding: var(--s-2) var(--s-4) var(--s-2) var(--s-2);
+  }
+
+  .dial {
+    width: 4.5rem;
+    height: 4.5rem;
+  }
+
+  .when-time {
+    font-size: 16px;
+  }
+
+  .when-step {
+    font-size: 12px;
+  }
+
+  .toggle {
+    gap: var(--s-3);
+  }
+
+  .toggle button,
+  .play {
+    font-size: 15px;
+  }
+
+  .caption {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    align-items: end;
+    font-size: 12px;
+  }
+
+  .caption span:last-child {
+    flex: none;
+  }
+
+  .book {
+    padding: var(--s-6) var(--s-4) var(--s-8);
+    overflow: visible;
+  }
+
+  .book h1 {
+    font-size: 2rem;
+  }
+
+  .fates {
+    font-size: 12px;
+  }
+
+  .group-count {
+    font-size: 12px;
+  }
+
+  .when {
+    width: auto;
+  }
+
+  .stamp {
+    margin-bottom: var(--s-2);
+  }
+
+  .fates .group td {
+    padding-top: var(--s-4);
+  }
+
+  .verdict {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto 1fr;
+    height: 17.5rem;
+    margin-top: var(--s-6);
+  }
+}

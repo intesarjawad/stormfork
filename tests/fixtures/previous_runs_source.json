@@ -1,0 +1,5 @@
+{
+  "url": "https://previous-runs-api.open-meteo.com/v1/forecast?latitude=25.788&longitude=-80.3169&models=ecmwf_ifs025%2Cgfs025%2Cicon_seamless%2Cecmwf_aifs025_single&hourly=temperature_2m_previous_day1%2Crelative_humidity_2m_previous_day1%2Cdew_point_2m_previous_day1%2Cprecipitation_previous_day1%2Cpressure_msl_previous_day1%2Ccloud_cover_previous_day1%2Cwind_speed_10m_previous_day1%2Cwind_gusts_10m_previous_day1%2Cwind_direction_10m_previous_day1&wind_speed_unit=ms&temperature_unit=celsius&timezone=GMT&start_date=2026-11-04&end_date=2026-11-05",
+  "station": "KMIA",
+  "recorded_at": "2026-11-07T09:55:00+00:00"
+}

@@ -1,0 +1,9 @@
+id: hindcast_helene_2024
+title: Hurricane Helene hindcast from three initial times
+kind: hindcast
+storm: 2024268N17278
+init: [2024-09-21T00:00Z, 2024-09-23T00:00Z, 2024-09-25T00:00Z]
+source: era5
+seeds: {baseline: 0, control: 1000}
+limits:
+  - "Initial conditions are reconstructed from ERA5 reanalysis, not the analysis available at the time, so a hindcast shows what the model does from a reconstructed state and is not the forecast it would have issued then."

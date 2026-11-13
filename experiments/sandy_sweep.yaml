@@ -1,0 +1,20 @@
+id: sandy_sweep
+title: Hurricane Sandy, starting position moved from 300 km west to 600 km east
+kind: sweep
+storm: 2012296N14283
+init: 2012-10-26T00:00Z
+source: era5
+edit:
+  type: relocate
+  params:
+    north_km: 0
+sweep:
+  param: east_km
+  values: [-300, -150, 0, 150, 300, 450, 600]
+taper:
+  centre: [24.8, -75.9]
+  radius_km: 833.4
+seeds: {baseline: 0, control: 1000}
+limits:
+  - "This storm is inside the model's training period (data through 2023), so the baseline is not an independent forecast; the fork shows how the trained model responds to the edit."
+  - "The shift is a constant angular offset at the taper centre with no area rescaling, and the adjustment ratio flags excess change without being a calibrated balance test."

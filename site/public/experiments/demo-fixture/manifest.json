@@ -1,0 +1,49 @@
+{
+  "id": "demo-fixture",
+  "title": "Demo fixture: smooth synthetic fields",
+  "fields": [
+    {
+      "name": "mslp",
+      "files": [
+        "mslp"
+      ],
+      "range": [
+        92000,
+        105000
+      ],
+      "encoding": "linear",
+      "resolution_deg": 1
+    },
+    {
+      "name": "wind10",
+      "files": [
+        "u10",
+        "v10"
+      ],
+      "range": [
+        -60,
+        60
+      ],
+      "encoding": "linear",
+      "resolution_deg": 2
+    }
+  ],
+  "runs": {
+    "baseline": {
+      "baseline/mslp.png": "b41e70cdc75d949d9c179b75d58306a8cfbdfc8e1c89357e7f93fa14ce980ce0",
+      "preview/baseline_mslp_f0.png": "7c3b149110e5ee096f2de4666330ab1a86863a0e0feeb6274c82fd70e60bb934",
+      "baseline/u10.png": "cf9dcbcccd6e7575b35e4bebb11a19d18ca93074a80b1ebeb97a2277dc16d4d4",
+      "preview/baseline_u10_f0.png": "524350d80b91eda2b6f2b62889a3b3b88ec72c7999db2616e27ee4c617d81431",
+      "baseline/v10.png": "ba5310692a7c7f0c6e436faa69ad415c51822484ba1dc3c1c0e02ca76586b594",
+      "preview/baseline_v10_f0.png": "e08c20d6cf6109ac78c3fce46aadec93732f581a5aec4d035c6adb4f1b27023a"
+    },
+    "fork": {
+      "fork/mslp.png": "1f40c2be54d348f699e1421aee9cb6ba2ae554ac05cb58f08627b46dec7bb4a4",
+      "preview/fork_mslp_f0.png": "82a8f877892a19e0395904d0d2ddaa1475cb7e5acd5b4260d7cabb8d49fa92c0",
+      "fork/u10.png": "44f5e3f5b933ebb567e83b5c3eafd6657936dd893cc861d32f84cc1efabe8a56",
+      "preview/fork_u10_f0.png": "e5c8aa73f482f702c57a1f347d5ca3254d68525c19c9ae006b6db5755ae674e6",
+      "fork/v10.png": "4a3b1c491364ed5a32d675ac5fed54f722f2ea420c3119044e720bd286beedf5",
+      "preview/fork_v10_f0.png": "b3dad35318c9662e663172f1595efb14ce1d21c1fb8cb57b62e85bf9fca8f648"
+    }
+  }
+}
