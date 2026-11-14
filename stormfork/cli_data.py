@@ -16,7 +16,15 @@ from stormfork.perturb import Taper
 
 def parse_time(value: str) -> datetime:
     """Normalize ISO timestamps to naive UTC for dataset and CSV comparisons."""
-    parsed = datetime.fromisoformat(value)
+    try:
+        parsed = datetime.fromisoformat(value)
+    except ValueError as error:
+        msg = f'invalid ISO timestamp "{value}"'
+        raise UserError(
+            msg,
+            "use an ISO time such as 2012-10-27T00:00Z; naive times are UTC",
+            2,
+        ) from error
     return parsed.astimezone(UTC).replace(tzinfo=None) if parsed.tzinfo else parsed
 
 
