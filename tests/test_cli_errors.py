@@ -1,10 +1,12 @@
 import hashlib
 import json
-from datetime import timedelta
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import pytest
 
+from stormfork.cli_data import parse_time
+from stormfork.errors import UserError
 from stormfork.scores.fetch import collect_wn2
 from tests.scores.test_fetch_wn2 import FIXTURES, INIT, TOWNS
 from tests.test_cli import invoke
@@ -147,6 +149,47 @@ def test_missing_taper_row_names_storm_and_time(
         )
     assert raised.value.code == 2
     assert "missing at 2005-08-24T12:00:00" in capsys.readouterr().err
+
+
+def test_invalid_time_has_an_actionable_error():
+    with pytest.raises(UserError) as raised:
+        parse_time("notatime")
+    assert raised.value.exit_code == 2
+    assert raised.value.what == 'invalid ISO timestamp "notatime"'
+    assert (
+        raised.value.next_step == "use an ISO time such as 2012-10-27T00:00Z; naive times are UTC"
+    )
+
+
+@pytest.mark.parametrize(
+    "value",
+    ["2012-10-27T00:00Z", "2012-10-27T05:30+05:30", "2012-10-27T00:00"],
+)
+def test_parse_time_normalizes_to_naive_utc(value: str):
+    assert parse_time(value) == datetime(2012, 10, 27)  # noqa: DTZ001 - dataset times are naive UTC
+
+
+def test_invalid_init_reports_the_format_and_usage_exit_code(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+):
+    with pytest.raises(SystemExit) as raised:
+        invoke(
+            monkeypatch,
+            "scenarios",
+            "taper",
+            "storm",
+            "--ibtracs",
+            "tests/fixtures/ibtracs_katrina_taper.csv",
+            "--init",
+            "notatime",
+        )
+    assert raised.value.code == 2
+    captured = capsys.readouterr()
+    assert not captured.out
+    assert captured.err == (
+        'error: invalid ISO timestamp "notatime"\n'
+        "next: use an ISO time such as 2012-10-27T00:00Z; naive times are UTC\n"
+    )
 
 
 def test_stale_collection_reports_failure_and_a_timed_retry(
