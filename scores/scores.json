@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-14",
-  "stale_since": "2026-11-16",
+  "generated_at": "2026-11-15",
+  "stale_since": "2026-11-17",
   "window_days": 91,
   "lead_days": [
     0
@@ -3823,5 +3823,5 @@
       "badge": null
     }
   ],
-  "wn2_previous_runs_available": null
+  "wn2_previous_runs_available": false
 }
